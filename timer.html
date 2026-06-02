@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Pomodoro</title>
+  <style>
+    :root {
+      --bg: #08090d;
+      --panel: rgba(24, 24, 27, 0.34);
+      --panel-border: rgba(255, 255, 255, 0.06);
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --button: #ffffff;
+      --button-text: #09090b;
+      --button-alt: rgba(255, 255, 255, 0.06);
+      --button-alt-text: #f4f4f5;
+      --focus: #6366f1;
+      --pause: #10b981;
+      --glow: rgba(99, 102, 241, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .glow {
+      position: absolute;
+      width: 120vw;
+      height: 120vw;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 9999px;
+      background: var(--glow);
+      filter: blur(120px);
+      pointer-events: none;
+      transition: background-color 300ms ease;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 390px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 36px;
+      padding: 22px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 32px 64px -12px rgba(0,0,0,0.6);
+      position: relative;
+      z-index: 1;
+    }
+
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 22px;
+      padding: 4px;
+      background: rgba(0,0,0,0.38);
+      border: 1px solid rgba(255,255,255,0.03);
+      border-radius: 18px;
+    }
+
+    .preset-btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      background: transparent;
+      color: var(--muted);
+      transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+    }
+
+    .preset-btn:active,
+    .action:active,
+    .icon-btn:active {
+      transform: scale(0.98);
+    }
+
+    .preset-btn.active {
+      background: rgba(255,255,255,0.10);
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .timer-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 280px;
+      margin: 0 auto 22px;
+      display: grid;
+      place-items: center;
+    }
+
+    .timer-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring-bg {
+      stroke: rgba(255,255,255,0.015);
+      stroke-width: 4;
+      fill: none;
+    }
+
+    .ring {
+      stroke-width: 4;
+      fill: none;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
+    }
+
+    .center {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .time {
+      font-size: clamp(48px, 13vw, 62px);
+      line-height: 1;
+      font-weight: 300;
+      letter-spacing: -0.06em;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+    }
+
+    .badge {
+      min-height: 24px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.05);
+      color: #d4d4d8;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .action,
+    .icon-btn {
+      border: 0;
+      height: 56px;
+      border-radius: 18px;
+      transition: transform 160ms ease, background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+
+    .action {
+      flex: 1;
+      background: var(--button);
+      color: var(--button-text);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+    }
+
+    .action.paused {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff;
+    }
+
+    .icon-btn {
+      width: 56px;
+      background: var(--button-alt);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--button-alt-text);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .small-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mini {
+      flex: 1;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #d4d4d8;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .settings {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .setting {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      color: #d4d4d8;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .setting input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: white;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: #71717a;
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.35;
+      min-height: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow" id="glow"></div>
+
+  <main class="card">
+    <section class="presets" aria-label="Presets">
+      <button class="preset-btn active" id="preset-25" type="button" onclick="selectPreset(25)">25 min</button>
+      <button class="preset-btn" id="preset-50" type="button" onclick="selectPreset(50)">50 min</button>
+      <button class="preset-btn" id="preset-10" type="button" onclick="selectPreset(10)">10 min</button>
+    </section>
+
+    <section class="timer-wrap" aria-label="Timer">
+      <svg class="timer-svg" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
+        <circle id="progress" class="ring" cx="100" cy="100" r="90" stroke="#ffffff" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="center">
+        <div id="time" class="time">25:00</div>
+        <div id="badge" class="badge">FOCUS SESSION</div>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button id="mainBtn" class="action" type="button" onclick="toggleTimer()">DEBUTER</button>
+      <button class="icon-btn" type="button" onclick="resetTimer()" aria-label="Reset">R</button>
+    </section>
+
+    <section class="small-row">
+      <button class="mini" type="button" onclick="adjustTime(-60)">-1 MIN</button>
+      <button class="mini" type="button" onclick="adjustTime(60)">+1 MIN</button>
+    </section>
+
+    <section class="settings">
+      <label class="setting">
+        <span>Notif</span>
+        <input id="notifToggle" type="checkbox" onchange="saveState()" />
+      </label>
+      <label class="setting">
+        <span>Son</span>
+        <input id="soundToggle" type="checkbox" checked onchange="saveState()" />
+      </label>
+    </section>
+
+    <div id="note" class="footer-note"></div>
+  </main>
+
+  <script>
+    const PRESETS = {
+      25: { work: 25 * 60, break: 5 * 60, color: '#6366f1', glow: 'rgba(99,102,241,0.06)' },
+      50: { work: 50 * 60, break: 10 * 60, color: '#f59e0b', glow: 'rgba(245,158,11,0.06)' },
+      10: { work: 10 * 60, break: 2 * 60, color: '#06b6d4', glow: 'rgba(6,182,212,0.06)' }
+    };
+
+    const STORAGE_KEY = 'pomodoro_single_html_v1';
+    const circumference = 2 * Math.PI * 90;
+
+    let currentPreset = 25;
+    let currentPhase = 'work';
+    let isActive = false;
+    let timeLeft = PRESETS[25].work;
+    let endTime = 0;
+    let loop = null;
+    let wakeLock = null;
+    let pendingNotification = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function setNote(msg) {
+      $('note').textContent = msg || '';
+    }
+
+    function beep(isBreak) {
+      if (!$('soundToggle').checked) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(isBreak ? 659.25 : 523.25, ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.55);
+      } catch (e) {}
+    }
+
+    function canNotify() {
+      return $('notifToggle').checked && 'Notification' in window;
+    }
+
+    async function requestNotificationPermission() {
+      if (!('Notification' in window)) return false;
+      if (Notification.permission === 'granted') return true;
+      if (Notification.permission === 'denied') return false;
+      try {
+        const result = await Notification.requestPermission();
+        return result === 'granted';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function showNotification(title, body) {
+      if (!canNotify()) return;
+      if (Notification.permission !== 'granted') return;
+      try {
+        new Notification(title, { body });
+      } catch (e) {}
+    }
+
+    async function requestWake() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+        } catch (e) {}
+      }
+    }
+
+    async function releaseWake() {
+      if (wakeLock) {
+        try { await wakeLock.release(); } catch (e) {}
+        wakeLock = null;
+      }
+    }
+
+    function updateRing() {
+      const total = currentPhase === 'work' ? PRESETS[currentPreset].work : PRESETS[currentPreset].break;
+      const offset = circumference - (timeLeft / total) * circumference;
+      $('progress').style.strokeDashoffset = offset;
+    }
+
+    function render() {
+      const m = Math.floor(Math.max(0, timeLeft) / 60).toString().padStart(2, '0');
+      const s = (Math.max(0, timeLeft) % 60).toString().padStart(2, '0');
+      $('time').textContent = `${m}:${s}`;
+
+      const cfg = PRESETS[currentPreset];
+      if (currentPhase === 'work') {
+        $('progress').setAttribute('stroke', cfg.color);
+        $('badge').textContent = 'FOCUS SESSION';
+        $('badge').style.background = 'rgba(255,255,255,0.05)';
+        $('badge').style.color = '#d4d4d8';
+        $('badge').style.borderColor = 'rgba(255,255,255,0.05)';
+        $('glow').style.background = cfg.glow;
+      } else {
+        $('progress').setAttribute('stroke', '#10b981');
+        $('badge').textContent = 'PAUSE';
+        $('badge').style.background = 'rgba(16,185,129,0.10)';
+        $('badge').style.color = '#6ee7b7';
+        $('badge').style.borderColor = 'rgba(16,185,129,0.12)';
+        $('glow').style.background = 'rgba(16,185,129,0.06)';
+      }
+
+      if (isActive) {
+        $('mainBtn').textContent = 'PAUSE';
+        $('mainBtn').classList.add('paused');
+      } else {
+        $('mainBtn').textContent = 'DEBUTER';
+        $('mainBtn').classList.remove('paused');
+      }
+
+      [25, 50, 10].forEach(v => {
+        $('preset-' + v).classList.toggle('active', v === currentPreset);
+      });
+
+      updateRing();
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        currentPreset,
+        currentPhase,
+        isActive,
+        timeLeft,
+        endTime,
+        notif: $('notifToggle').checked,
+        sound: $('soundToggle').checked
+      }));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        timeLeft = PRESETS[currentPreset].work;
+        render();
+        return;
+      }
+
+      try {
+        const state = JSON.parse(raw);
+        currentPreset = state.currentPreset || 25;
+        currentPhase = state.currentPhase || 'work';
+        isActive = !!state.isActive;
+        timeLeft = typeof state.timeLeft === 'number' ? state.timeLeft : PRESETS[currentPreset].work;
+        endTime = typeof state.endTime === 'number' ? state.endTime : 0;
+        $('notifToggle').checked = !!state.notif;
+        $('soundToggle').checked = state.sound !== false;
+
+        if (isActive && endTime > Date.now()) {
+          timeLeft = Math.ceil((endTime - Date.now()) / 1000);
+          startLoop();
+          requestWake();
+        } else if (isActive && endTime <= Date.now()) {
+          catchUp();
+        } else {
+          isActive = false;
+          timeLeft = Math.max(0, timeLeft);
+        }
+      } catch (e) {
+        currentPreset = 25;
+        currentPhase = 'work';
+        isActive = false;
+        timeLeft = PRESETS[25].work;
+      }
+
+      render();
+    }
+
+    function selectPreset(minutes) {
+      if (isActive) return;
+      currentPreset = minutes;
+      currentPhase = 'work';
+      timeLeft = PRESETS[minutes].work;
+      setNote('');
+      saveState();
+      render();
+    }
+
+    function adjustTime(delta) {
+      if (isActive) return;
+      timeLeft = Math.max(60, timeLeft + delta);
+      setNote('');
+      saveState();
+      render();
+    }
+
+    function startLoop() {
+      stopLoop();
+      loop = setInterval(() => {
+        const now = Date.now();
+        if (now >= endTime) {
+          catchUp();
+        } else {
+          timeLeft = Math.ceil((endTime - now) / 1000);
+          render();
+        }
+      }, 500);
+    }
+
+    function stopLoop() {
+      if (loop) clearInterval(loop);
+      loop = null;
+    }
+
+    function catchUp() {
+      const now = Date.now();
+
+      while (isActive && now >= endTime) {
+        if (currentPhase === 'work') {
+          currentPhase = 'break';
+          const breakDuration = PRESETS[currentPreset].break;
+          endTime = endTime + (breakDuration * 1000);
+          timeLeft = Math.max(0, Math.ceil((endTime - now) / 1000));
+          beep(true);
+          if (navigator.vibrate) navigator.vibrate([180, 80, 180]);
+          showNotification('Pomodoro', 'Session terminee. Pause commencee.');
+        } else {
+          isActive = false;
+          currentPhase = 'work';
+          timeLeft = PRESETS[currentPreset].work;
+          endTime = 0;
+          beep(false);
+          if (navigator.vibrate) navigator.vibrate(300);
+          showNotification('Pomodoro', 'Pause terminee. Retour au focus.');
+          releaseWake();
+          pendingNotification = null;
+          break;
+        }
+      }
+
+      if (isActive) {
+        timeLeft = Math.max(0, Math.ceil((endTime - now) / 1000));
+        startLoop();
+      } else {
+        stopLoop();
+      }
+
+      saveState();
+      render();
+    }
+
+    async function toggleTimer() {
+      if (isActive) {
+        isActive = false;
+        stopLoop();
+        timeLeft = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+        endTime = 0;
+        releaseWake();
+        setNote('Pause manuelle.');
+      } else {
+        if (canNotify()) {
+          await requestNotificationPermission();
+        }
+        isActive = true;
+        endTime = Date.now() + (timeLeft * 1000);
+        pendingNotification = {
+          phase: currentPhase,
+          when: endTime
+        };
+        beep(currentPhase === 'break');
+        startLoop();
+        requestWake();
+        setNote('');
+      }
+      saveState();
+      render();
+    }
+
+    function resetTimer() {
+      isActive = false;
+      stopLoop();
+      currentPhase = 'work';
+      timeLeft = PRESETS[currentPreset].work;
+      endTime = 0;
+      pendingNotification = null;
+      releaseWake();
+      setNote('Reset.');
+      saveState();
+      render();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && isActive) {
+        catchUp();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      if (isActive) catchUp();
+    });
+
+    window.addEventListener('beforeunload', () => {
+      saveState();
+    });
+
+    loadState();
+  </script>
+</body>
+        </html>
+        
