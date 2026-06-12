@@ -296,7 +296,7 @@
     <section class="settings">
       <label class="setting">
         <span>Notif</span>
-        <input id="notifToggle" type="checkbox" onchange="saveState()" />
+        <input id="notifToggle" type="checkbox" onchange="toggleNotifications()" />
       </label>
       <label class="setting">
         <span>Son</span>
@@ -351,24 +351,50 @@
     }
 
     function canNotify() {
-      return $('notifToggle').checked && 'Notification' in window;
+      return $('notifToggle').checked && 'Notification' in window && Notification.permission === 'granted';
     }
 
     async function requestNotificationPermission() {
-      if (!('Notification' in window)) return false;
+      if (!('Notification' in window)) {
+        setNote('Notifications non supportées');
+        return false;
+      }
       if (Notification.permission === 'granted') return true;
-      if (Notification.permission === 'denied') return false;
+      if (Notification.permission === 'denied') {
+        setNote('Notifications refusées. Vérifiez les paramètres.');
+        return false;
+      }
       try {
         const result = await Notification.requestPermission();
-        return result === 'granted';
+        if (result === 'granted') {
+          setNote('Notifications activées.');
+          return true;
+        } else {
+          setNote('Notifications refusées.');
+          return false;
+        }
       } catch (e) {
+        setNote('Erreur permission notifications');
         return false;
       }
     }
 
+    async function toggleNotifications() {
+      const isChecked = $('notifToggle').checked;
+      
+      if (isChecked && Notification.permission !== 'granted') {
+        const permitted = await requestNotificationPermission();
+        if (!permitted) {
+          $('notifToggle').checked = false;
+          return;
+        }
+      }
+      
+      saveState();
+    }
+
     function showNotification(title, body) {
       if (!canNotify()) return;
-      if (Notification.permission !== 'granted') return;
       try {
         new Notification(title, { body });
       } catch (e) {}
@@ -564,8 +590,11 @@
         releaseWake();
         setNote('Pause manuelle.');
       } else {
-        if (canNotify()) {
-          await requestNotificationPermission();
+        if ($('notifToggle').checked && Notification.permission !== 'granted') {
+          const permitted = await requestNotificationPermission();
+          if (!permitted) {
+            $('notifToggle').checked = false;
+          }
         }
         isActive = true;
         endTime = Date.now() + (timeLeft * 1000);
@@ -612,5 +641,4 @@
     loadState();
   </script>
 </body>
-        </html>
-        
+</html>
