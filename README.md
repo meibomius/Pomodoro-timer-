@@ -1,3 +1,4 @@
+````markdown
 # Chronoflow ⏱️
 
 A minimalist, distraction-free focus timer engineered for reliability, precision, and mobile-first usability.
@@ -130,6 +131,7 @@ Everything remains **on your device**.
 - HTML5
 - CSS3 (with CSS variables, media queries)
 - Vanilla JavaScript (ES6+)
+- Module pattern (IIFE)
 
 **Storage:**
 - LocalStorage (browser persistence)
@@ -205,10 +207,10 @@ Simply upload `index.html` to any static hosting.
 
 | Action | Key |
 |--------|-----|
-| Start/Pause | `Space` or Click button |
-| Reset | Click ⟲ button |
-| Adjust Time | Click -1 MIN / +1 MIN |
-| Change Preset | Click 10 min / 25 min / 50 min |
+| Start/Pause | `Space` |
+| Reset | `R` |
+| Adjust Time | Click buttons |
+| Change Preset | Click preset buttons |
 
 ---
 
@@ -242,7 +244,7 @@ Simply upload `index.html` to any static hosting.
 - No frameworks
 - No package manager
 - No runtime dependencies
-- **~28 KB uncompressed** (gzipped: ~8 KB)
+- **~32 KB uncompressed** (gzipped: ~9 KB)
 
 ### Fast Startup
 - Instant loading
@@ -252,7 +254,7 @@ Simply upload `index.html` to any static hosting.
 
 ### Battery Efficiency
 - Lightweight rendering
-- Efficient update loops (500ms intervals during active session)
+- Efficient update loops (500ms intervals)
 - Reduced background activity
 
 ---
@@ -262,29 +264,36 @@ Simply upload `index.html` to any static hosting.
 ### Local Setup
 
 ```bash
-# Install dependencies (optional, for linting)
-npm install
-
 # Start development server
-npm run dev
+npx http-server
 
-# Format code
-npm run format
-
-# Check code
-npm run lint
+# Or with Python
+python -m http.server 8000
 ```
 
 ### Code Structure
 
 - `index.html` - Complete application (HTML + CSS + JS)
-- `manifest.json` - PWA configuration
-- `vercel.json` - Vercel deployment config
-- `package.json` - Project metadata
+- Single-file architecture with IIFE module pattern
+- All styles and scripts embedded
+
+### Code Quality
+
+- ✅ Module pattern (IIFE) for scope management
+- ✅ Comprehensive error handling
+- ✅ Input validation for all presets
+- ✅ CSP (Content Security Policy) enabled
+- ✅ Logging with prefixed console output
+- ✅ Type-safe comparisons
 
 ### Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please:
+1. Test thoroughly on mobile devices
+2. Ensure keyboard accessibility
+3. Maintain the single-file structure
+4. Follow the existing code style
+5. Add JSDoc comments for new functions
 
 ---
 
@@ -297,11 +306,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - [ ] Daily statistics
 - [ ] Weekly reports
 - [ ] Session history export
-- [ ] Theme customization
+- [ ] Theme customization (dark/light toggle)
 - [ ] Advanced PWA support
-- [ ] Keyboard shortcuts
 - [ ] Multiple timers
-- [ ] Dark/Light mode toggle
+- [ ] Background modes
 
 ---
 
@@ -322,7 +330,7 @@ Edit CSS variables in `<style>`:
 
 ### Adjust Preset Durations
 
-Edit `PRESETS` in `<script>`:
+Edit `PRESETS` in the script:
 
 ```javascript
 const PRESETS = {
@@ -331,6 +339,36 @@ const PRESETS = {
   30: { work: 30 * 60, break: 5 * 60, color: '#f59e0b', glow: 'rgba(245,158,11,0.06)' }
 };
 ```
+
+---
+
+## 🔧 Improvements in v2.0
+
+### Code Optimization
+- ✅ Refactored to IIFE module pattern
+- ✅ Removed global variables pollution
+- ✅ Added input validation
+- ✅ Improved error handling
+- ✅ Added logging system with prefix
+
+### Bug Fixes
+- ✅ Fixed preset validation
+- ✅ Added clamp function for time adjustments
+- ✅ Fixed notification permission flow
+- ✅ Improved wake lock management
+- ✅ Better state recovery after crashes
+
+### Security
+- ✅ Added CSP meta tag
+- ✅ Input validation for all user actions
+- ✅ Type checking for presets
+- ✅ Safe error handling
+
+### Accessibility
+- ✅ Better ARIA labels
+- ✅ Improved keyboard shortcuts (Space + R)
+- ✅ Better focus management
+- ✅ Screen reader optimizations
 
 ---
 
@@ -360,3 +398,4 @@ Independent project focused on creating fast, reliable, privacy-friendly product
 Built with ❤️ for focused work and deep productivity.
 
 Inspired by the Pomodoro Technique by Francesco Cirillo.
+````
