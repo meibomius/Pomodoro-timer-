@@ -7,19 +7,39 @@
   <meta name="theme-color" content="#08090d" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Pomodoro" />
-  <meta property="og:title" content="Pomodoro Timer" />
+  <meta name="apple-mobile-web-app-title" content="Chronoflow" />
+  <meta property="og:title" content="Chronoflow - Focus Timer" />
   <meta property="og:description" content="Minuteur Pomodoro minimaliste avec notifications et sons" />
+  <meta property="og:url" content="https://chronoflow.vercel.app/" />
+  <meta property="og:type" content="website" />
   <meta name="color-scheme" content="light dark" />
-  <title>Pomodoro - Minuteur de productivité</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff6b6b'/><circle cx='50' cy='50' r='40' fill='%23220022'/><line x1='50' y1='20' x2='50' y2='40' stroke='%23fff' stroke-width='3' stroke-linecap='round'/><line x1='50' y1='50' x2='70' y2='50' stroke='%23fff' stroke-width='3' stroke-linecap='round'/></svg>" />
+  <meta name="keywords" content="pomodoro, timer, productivity, focus, deep work" />
+  <title>Chronoflow - Minuteur de productivité</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff6b6b'/><circle cx='50' cy='50' r='40' fill='%232d2d2d'/><path d='M50,20 L50,50 L75,65' stroke='%23ff6b6b' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><circle cx='90' cy='90' r='85' fill='%23ff6b6b'/><circle cx='90' cy='90' r='75' fill='%232d2d2d'/><path d='M90,30 L90,90 L120,115' stroke='%23ff6b6b' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Chronoflow",
+    "description": "Minimalist focus timer for deep work and productivity",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
   <style>
     :root {
       --bg: #08090d;
       --panel: rgba(24, 24, 27, 0.34);
       --panel-border: rgba(255, 255, 255, 0.06);
       --text: #f4f4f5;
-      --muted: #71717a;
+      --muted: #52525b;
       --button: #ffffff;
       --button-text: #09090b;
       --button-alt: rgba(255, 255, 255, 0.06);
@@ -36,7 +56,7 @@
         --panel: rgba(255, 255, 255, 0.7);
         --panel-border: rgba(0, 0, 0, 0.1);
         --text: #1f2937;
-        --muted: #6b7280;
+        --muted: #4b5563;
         --button: #09090b;
         --button-text: #ffffff;
         --button-alt: rgba(0, 0, 0, 0.05);
@@ -44,8 +64,8 @@
       }
     }
 
-    * { 
-      box-sizing: border-box; 
+    * {
+      box-sizing: border-box;
     }
 
     html, body {
@@ -206,7 +226,6 @@
       border: 1px solid rgba(255,255,255,0.05);
       background: rgba(255,255,255,0.05);
       color: #d4d4d8;
-      aria-live: polite;
     }
 
     .actions {
@@ -363,8 +382,6 @@
       text-align: center;
       line-height: 1.35;
       min-height: 16px;
-      aria-live: polite;
-      aria-atomic: true;
     }
 
     .footer-note.error {
@@ -397,11 +414,11 @@
 <body>
   <div class="glow" id="glow"></div>
 
-  <main class="card">
-    <section class="presets" aria-label="Presets de durée">
-      <button class="preset-btn active" id="preset-25" type="button" onclick="selectPreset(25)">25 min</button>
-      <button class="preset-btn" id="preset-50" type="button" onclick="selectPreset(50)">50 min</button>
-      <button class="preset-btn" id="preset-10" type="button" onclick="selectPreset(10)">10 min</button>
+  <main class="card" role="main">
+    <section class="presets" aria-label="Présets de durée">
+      <button class="preset-btn active" id="preset-25" type="button" aria-label="Session de 25 minutes">25 min</button>
+      <button class="preset-btn" id="preset-50" type="button" aria-label="Session de 50 minutes">50 min</button>
+      <button class="preset-btn" id="preset-10" type="button" aria-label="Session de 10 minutes">10 min</button>
     </section>
 
     <section class="timer-wrap" aria-label="Minuteur">
@@ -410,29 +427,29 @@
         <circle id="progress" class="ring" cx="100" cy="100" r="90" stroke="#ffffff" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
       </svg>
       <div class="center">
-        <div id="time" class="time" aria-live="polite" aria-atomic="true">25:00</div>
-        <div id="badge" class="badge" aria-live="polite">FOCUS SESSION</div>
+        <div id="time" class="time" role="status" aria-live="polite" aria-atomic="true">25:00</div>
+        <div id="badge" class="badge" role="status" aria-live="polite" aria-atomic="true">FOCUS SESSION</div>
       </div>
     </section>
 
     <section class="actions">
-      <button id="mainBtn" class="action" type="button" onclick="toggleTimer()" aria-label="Démarrer le minuteur">DEBUTER</button>
-      <button class="icon-btn" type="button" onclick="resetTimer()" aria-label="Réinitialiser le minuteur">⟲</button>
+      <button id="mainBtn" class="action" type="button" aria-label="Démarrer le minuteur">DEBUTER</button>
+      <button class="icon-btn" type="button" aria-label="Réinitialiser le minuteur">⟲</button>
     </section>
 
     <section class="small-row">
-      <button class="mini" type="button" onclick="adjustTime(-60)" aria-label="Diminuer de 1 minute">-1 MIN</button>
-      <button class="mini" type="button" onclick="adjustTime(60)" aria-label="Augmenter de 1 minute">+1 MIN</button>
+      <button class="mini" type="button" aria-label="Diminuer de 1 minute">-1 MIN</button>
+      <button class="mini" type="button" aria-label="Augmenter de 1 minute">+1 MIN</button>
     </section>
 
     <section class="settings">
       <label class="setting">
         <span>Notif</span>
-        <input id="notifToggle" type="checkbox" onchange="toggleNotifications()" aria-label="Activer les notifications" />
+        <input id="notifToggle" type="checkbox" aria-label="Activer les notifications" />
       </label>
       <label class="setting">
         <span>Son</span>
-        <input id="soundToggle" type="checkbox" checked onchange="saveState()" aria-label="Activer les sons" />
+        <input id="soundToggle" type="checkbox" checked aria-label="Activer les sons" />
       </label>
     </section>
 
@@ -447,19 +464,26 @@
       </div>
     </section>
 
-    <div id="note" class="footer-note"></div>
+    <div id="note" class="footer-note" role="status" aria-live="polite" aria-atomic="true"></div>
   </main>
 
   <script>
+    /**
+     * Chronoflow - Minimalist Focus Timer
+     * A distraction-free Pomodoro timer with offline support
+     */
+
+    // Constants
     const PRESETS = {
       25: { work: 25 * 60, break: 5 * 60, color: '#6366f1', glow: 'rgba(99,102,241,0.06)' },
       50: { work: 50 * 60, break: 10 * 60, color: '#f59e0b', glow: 'rgba(245,158,11,0.06)' },
       10: { work: 10 * 60, break: 2 * 60, color: '#06b6d4', glow: 'rgba(6,182,212,0.06)' }
     };
 
-    const STORAGE_KEY = 'pomodoro_single_html_v2';
+    const STORAGE_KEY = 'pomodoro_single_html_v3';
     const circumference = 2 * Math.PI * 90;
 
+    // State
     let currentPreset = 25;
     let currentPhase = 'work';
     let isActive = false;
@@ -469,29 +493,59 @@
     let wakeLock = null;
     let completedSessions = 0;
     let totalTimeSpent = 0;
-    
-    // Shared AudioContext instance
     let audioCtx = null;
-    const initAudioContext = () => {
-      if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContextClass();
-      }
-      return audioCtx;
-    };
 
+    // Utility: DOM element getter
     const $ = (id) => document.getElementById(id);
 
+    /**
+     * Initialize or get AudioContext
+     * @returns {AudioContext|null} The AudioContext or null if unavailable
+     */
+    const initAudioContext = () => {
+      if (audioCtx) return audioCtx;
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        console.warn('Web Audio API not supported');
+        return null;
+      }
+
+      try {
+        audioCtx = new AudioContextClass();
+        return audioCtx;
+      } catch (e) {
+        console.error('Failed to create AudioContext:', e);
+        return null;
+      }
+    };
+
+    /**
+     * Display a note/message to the user
+     * @param {string} msg - Message to display
+     * @param {boolean} isError - Whether to style as error
+     */
     function setNote(msg, isError = false) {
       const noteEl = $('note');
       noteEl.textContent = msg || '';
       noteEl.classList.toggle('error', isError);
     }
 
+    /**
+     * Play a beep sound (work or break)
+     * @param {boolean} isBreak - Whether this is a break phase
+     */
     function beep(isBreak) {
-      if (!$('soundToggle').checked) return;
+      const soundToggle = $('soundToggle');
+      if (!soundToggle?.checked) return;
+
+      const ctx = initAudioContext();
+      if (!ctx) {
+        console.warn('Audio context unavailable, skipping beep');
+        return;
+      }
+
       try {
-        const ctx = initAudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
@@ -503,14 +557,22 @@
         osc.start();
         osc.stop(ctx.currentTime + 0.55);
       } catch (e) {
-        console.error('Erreur audio:', e);
+        console.error('Beep failed:', e);
       }
     }
 
+    /**
+     * Check if notifications can be displayed
+     * @returns {boolean} Whether notifications are available and enabled
+     */
     function canNotify() {
       return $('notifToggle').checked && 'Notification' in window && Notification.permission === 'granted';
     }
 
+    /**
+     * Request notification permission from user
+     * @returns {Promise<boolean>} Whether permission was granted
+     */
     async function requestNotificationPermission() {
       if (!('Notification' in window)) {
         setNote('Notifications non supportées', true);
@@ -536,9 +598,12 @@
       }
     }
 
+    /**
+     * Toggle notification preference and request permission if needed
+     */
     async function toggleNotifications() {
       const isChecked = $('notifToggle').checked;
-      
+
       if (isChecked && Notification.permission !== 'granted') {
         const permitted = await requestNotificationPermission();
         if (!permitted) {
@@ -546,50 +611,69 @@
           return;
         }
       }
-      
+
       saveState();
     }
 
+    /**
+     * Display a system notification
+     * @param {string} title - Notification title
+     * @param {string} body - Notification body
+     */
     function showNotification(title, body) {
       if (!canNotify()) return;
       try {
-        new Notification(title, { 
+        new Notification(title, {
           body,
           tag: 'pomodoro',
           badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ff6b6b"/></svg>'
         });
       } catch (e) {
-        console.error('Erreur notification:', e);
+        console.error('Notification failed:', e);
       }
     }
 
+    /**
+     * Request screen wake lock
+     */
     async function requestWake() {
       if ('wakeLock' in navigator) {
         try {
           wakeLock = await navigator.wakeLock.request('screen');
         } catch (e) {
-          console.warn('Wake Lock échoué:', e);
+          console.warn('Wake Lock request failed:', e);
         }
       }
     }
 
+    /**
+     * Release screen wake lock
+     */
     async function releaseWake() {
       if (wakeLock) {
-        try { 
-          await wakeLock.release(); 
+        try {
+          await wakeLock.release();
         } catch (e) {
-          console.warn('Erreur libération Wake Lock:', e);
+          console.warn('Wake Lock release failed:', e);
         }
         wakeLock = null;
       }
     }
 
+    /**
+     * Update the progress ring visualization
+     */
     function updateRing() {
       const total = currentPhase === 'work' ? PRESETS[currentPreset].work : PRESETS[currentPreset].break;
-      const offset = circumference - (timeLeft / total) * circumference;
+      const offset = circumference - (Math.max(0, timeLeft) / total) * circumference;
       $('progress').style.strokeDashoffset = offset;
     }
 
+    /**
+     * Format seconds to human-readable time
+     * @param {number} seconds - Time in seconds
+     * @returns {string} Formatted time string
+     */
     function formatTime(seconds) {
       const hours = Math.floor(seconds / 3600);
       const mins = Math.floor((seconds % 3600) / 60);
@@ -597,11 +681,17 @@
       return `${mins}m`;
     }
 
+    /**
+     * Update stats display
+     */
     function updateStats() {
       $('completedSessions').textContent = completedSessions;
       $('totalTime').textContent = formatTime(totalTimeSpent);
     }
 
+    /**
+     * Render the UI with current state
+     */
     function render() {
       const m = Math.floor(Math.max(0, timeLeft) / 60).toString().padStart(2, '0');
       const s = (Math.max(0, timeLeft) % 60).toString().padStart(2, '0');
@@ -633,26 +723,33 @@
       }
 
       [25, 50, 10].forEach(v => {
-        $('preset-' + v).classList.toggle('active', v === currentPreset);
+        const btn = $('preset-' + v);
+        if (btn) btn.classList.toggle('active', v === currentPreset);
       });
 
       updateRing();
     }
 
+    /**
+     * Save application state to localStorage
+     */
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         currentPreset,
         currentPhase,
         isActive,
-        timeLeft,
+        timeLeft: Math.max(0, timeLeft),
         endTime,
-        notif: $('notifToggle').checked,
-        sound: $('soundToggle').checked,
+        notif: $('notifToggle')?.checked,
+        sound: $('soundToggle')?.checked ?? true,
         completedSessions,
         totalTimeSpent
       }));
     }
 
+    /**
+     * Load application state from localStorage
+     */
     function loadState() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
@@ -667,12 +764,15 @@
         currentPreset = state.currentPreset || 25;
         currentPhase = state.currentPhase || 'work';
         isActive = !!state.isActive;
-        timeLeft = typeof state.timeLeft === 'number' ? state.timeLeft : PRESETS[currentPreset].work;
+        timeLeft = typeof state.timeLeft === 'number' ? Math.max(0, state.timeLeft) : PRESETS[currentPreset].work;
         endTime = typeof state.endTime === 'number' ? state.endTime : 0;
         completedSessions = typeof state.completedSessions === 'number' ? state.completedSessions : 0;
         totalTimeSpent = typeof state.totalTimeSpent === 'number' ? state.totalTimeSpent : 0;
-        $('notifToggle').checked = !!state.notif;
-        $('soundToggle').checked = state.sound !== false;
+
+        const notifToggle = $('notifToggle');
+        const soundToggle = $('soundToggle');
+        if (notifToggle) notifToggle.checked = !!state.notif;
+        if (soundToggle) soundToggle.checked = state.sound !== false;
 
         if (isActive && endTime > Date.now()) {
           timeLeft = Math.ceil((endTime - Date.now()) / 1000);
@@ -685,7 +785,7 @@
           timeLeft = Math.max(0, timeLeft);
         }
       } catch (e) {
-        console.error('Erreur chargement état:', e);
+        console.error('Failed to load state:', e);
         currentPreset = 25;
         currentPhase = 'work';
         isActive = false;
@@ -696,6 +796,10 @@
       updateStats();
     }
 
+    /**
+     * Select a preset duration
+     * @param {number} minutes - Preset duration in minutes
+     */
     function selectPreset(minutes) {
       if (isActive) return;
       currentPreset = minutes;
@@ -706,6 +810,10 @@
       render();
     }
 
+    /**
+     * Adjust time by delta
+     * @param {number} delta - Time change in seconds
+     */
     function adjustTime(delta) {
       if (isActive) return;
       timeLeft = Math.max(60, timeLeft + delta);
@@ -714,6 +822,9 @@
       render();
     }
 
+    /**
+     * Start the timer loop
+     */
     function startLoop() {
       stopLoop();
       loop = setInterval(() => {
@@ -727,11 +838,17 @@
       }, 500);
     }
 
+    /**
+     * Stop the timer loop
+     */
     function stopLoop() {
       if (loop) clearInterval(loop);
       loop = null;
     }
 
+    /**
+     * Handle timer completion and phase transitions
+     */
     function catchUp() {
       const now = Date.now();
 
@@ -745,7 +862,7 @@
           totalTimeSpent += PRESETS[currentPreset].work;
           beep(true);
           if (navigator.vibrate) navigator.vibrate([180, 80, 180]);
-          showNotification('Pomodoro', 'Session terminée. Pause commencée.');
+          showNotification('Chronoflow', 'Session terminée. Pause commencée.');
         } else {
           isActive = false;
           currentPhase = 'work';
@@ -753,7 +870,7 @@
           endTime = 0;
           beep(false);
           if (navigator.vibrate) navigator.vibrate(300);
-          showNotification('Pomodoro', 'Pause terminée. Retour au focus.');
+          showNotification('Chronoflow', 'Pause terminée. Retour au focus.');
           releaseWake();
           break;
         }
@@ -771,6 +888,9 @@
       render();
     }
 
+    /**
+     * Toggle timer start/pause
+     */
     async function toggleTimer() {
       if (isActive) {
         isActive = false;
@@ -780,10 +900,11 @@
         releaseWake();
         setNote('Pause manuelle');
       } else {
-        if ($('notifToggle').checked && Notification.permission !== 'granted') {
+        if ($('notifToggle')?.checked && Notification.permission !== 'granted') {
           const permitted = await requestNotificationPermission();
           if (!permitted) {
-            $('notifToggle').checked = false;
+            const toggle = $('notifToggle');
+            if (toggle) toggle.checked = false;
           }
         }
         isActive = true;
@@ -797,6 +918,9 @@
       render();
     }
 
+    /**
+     * Reset timer to initial state
+     */
     function resetTimer() {
       isActive = false;
       stopLoop();
@@ -808,6 +932,23 @@
       saveState();
       render();
     }
+
+    // Event Listeners
+    document.getElementById('preset-25')?.addEventListener('click', () => selectPreset(25));
+    document.getElementById('preset-50')?.addEventListener('click', () => selectPreset(50));
+    document.getElementById('preset-10')?.addEventListener('click', () => selectPreset(10));
+
+    document.getElementById('mainBtn')?.addEventListener('click', toggleTimer);
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+      btn.addEventListener('click', resetTimer);
+    });
+
+    document.querySelectorAll('.mini').forEach((btn, index) => {
+      btn.addEventListener('click', () => adjustTime(index === 0 ? -60 : 60));
+    });
+
+    document.getElementById('notifToggle')?.addEventListener('change', toggleNotifications);
+    document.getElementById('soundToggle')?.addEventListener('change', saveState);
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && isActive) {
@@ -823,11 +964,7 @@
       saveState();
     });
 
-    // Amélioration du contraste pour l'accessibilité
-    if (window.matchMedia && window.matchMedia('(prefers-contrast: more)').matches) {
-      document.documentElement.style.setProperty('--muted', '#4b5563');
-    }
-
+    // Initialize
     loadState();
   </script>
 </body>
