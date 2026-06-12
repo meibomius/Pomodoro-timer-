@@ -2,15 +2,24 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Pomodoro</title>
+  <meta name="description" content="Minuteur Pomodoro minimaliste avec notifications, sons et statistiques. Productivité simplifiée." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#08090d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pomodoro" />
+  <meta property="og:title" content="Pomodoro Timer" />
+  <meta property="og:description" content="Minuteur Pomodoro minimaliste avec notifications et sons" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Pomodoro - Minuteur de productivité</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff6b6b'/><circle cx='50' cy='50' r='40' fill='%23220022'/><line x1='50' y1='20' x2='50' y2='40' stroke='%23fff' stroke-width='3' stroke-linecap='round'/><line x1='50' y1='50' x2='70' y2='50' stroke='%23fff' stroke-width='3' stroke-linecap='round'/></svg>" />
   <style>
     :root {
       --bg: #08090d;
       --panel: rgba(24, 24, 27, 0.34);
       --panel-border: rgba(255, 255, 255, 0.06);
       --text: #f4f4f5;
-      --muted: #a1a1aa;
+      --muted: #71717a;
       --button: #ffffff;
       --button-text: #09090b;
       --button-alt: rgba(255, 255, 255, 0.06);
@@ -18,9 +27,27 @@
       --focus: #6366f1;
       --pause: #10b981;
       --glow: rgba(99, 102, 241, 0.06);
+      --error: #ef4444;
     }
 
-    * { box-sizing: border-box; }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f9fafb;
+        --panel: rgba(255, 255, 255, 0.7);
+        --panel-border: rgba(0, 0, 0, 0.1);
+        --text: #1f2937;
+        --muted: #6b7280;
+        --button: #09090b;
+        --button-text: #ffffff;
+        --button-alt: rgba(0, 0, 0, 0.05);
+        --button-alt-text: #1f2937;
+      }
+    }
+
+    * { 
+      box-sizing: border-box; 
+    }
+
     html, body {
       margin: 0;
       min-height: 100%;
@@ -30,6 +57,7 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       overflow-x: hidden;
+      transition: background-color 200ms ease, color 200ms ease;
     }
 
     body {
@@ -53,6 +81,7 @@
       filter: blur(120px);
       pointer-events: none;
       transition: background-color 300ms ease;
+      will-change: background-color;
     }
 
     .card {
@@ -62,7 +91,7 @@
       border: 1px solid var(--panel-border);
       border-radius: 36px;
       padding: 22px;
-      backdrop-filter: blur(24px);
+      backdrop-filter: blur(12px);
       box-shadow: 0 32px 64px -12px rgba(0,0,0,0.6);
       position: relative;
       z-index: 1;
@@ -88,6 +117,7 @@
       letter-spacing: 0.01em;
       background: transparent;
       color: var(--muted);
+      cursor: pointer;
       transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
     }
 
@@ -95,6 +125,14 @@
     .action:active,
     .icon-btn:active {
       transform: scale(0.98);
+    }
+
+    .preset-btn:focus-visible,
+    .action:focus-visible,
+    .icon-btn:focus-visible,
+    .mini:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
     }
 
     .preset-btn.active {
@@ -151,6 +189,12 @@
       color: #fff;
     }
 
+    @media (prefers-color-scheme: light) {
+      .time {
+        color: #1f2937;
+      }
+    }
+
     .badge {
       min-height: 24px;
       padding: 6px 12px;
@@ -162,6 +206,7 @@
       border: 1px solid rgba(255,255,255,0.05);
       background: rgba(255,255,255,0.05);
       color: #d4d4d8;
+      aria-live: polite;
     }
 
     .actions {
@@ -175,6 +220,7 @@
       border: 0;
       height: 56px;
       border-radius: 18px;
+      cursor: pointer;
       transition: transform 160ms ease, background-color 160ms ease, color 160ms ease, border-color 160ms ease;
     }
 
@@ -186,6 +232,11 @@
       font-weight: 700;
       letter-spacing: 0.02em;
       box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+    }
+
+    .action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
     }
 
     .action.paused {
@@ -201,6 +252,10 @@
       color: var(--button-alt-text);
       font-size: 15px;
       font-weight: 700;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255,255,255,0.12);
     }
 
     .small-row {
@@ -219,6 +274,17 @@
       color: #d4d4d8;
       font-size: 12px;
       font-weight: 700;
+      cursor: pointer;
+      transition: transform 160ms ease, background-color 160ms ease;
+    }
+
+    .mini:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .mini:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .settings {
@@ -245,7 +311,49 @@
     .setting input[type="checkbox"] {
       width: 18px;
       height: 18px;
-      accent-color: white;
+      accent-color: var(--focus);
+      cursor: pointer;
+    }
+
+    .setting input[type="checkbox"]:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .stats {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-box {
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .stat-box .label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-box .value {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      .stat-box .value {
+        color: #1f2937;
+      }
     }
 
     .footer-note {
@@ -255,10 +363,34 @@
       text-align: center;
       line-height: 1.35;
       min-height: 16px;
+      aria-live: polite;
+      aria-atomic: true;
+    }
+
+    .footer-note.error {
+      color: var(--error);
     }
 
     .hidden {
       display: none !important;
+    }
+
+    @media (max-width: 360px) {
+      .card {
+        padding: 16px;
+      }
+
+      .time {
+        font-size: clamp(40px, 12vw, 56px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
@@ -266,42 +398,53 @@
   <div class="glow" id="glow"></div>
 
   <main class="card">
-    <section class="presets" aria-label="Presets">
+    <section class="presets" aria-label="Presets de durée">
       <button class="preset-btn active" id="preset-25" type="button" onclick="selectPreset(25)">25 min</button>
       <button class="preset-btn" id="preset-50" type="button" onclick="selectPreset(50)">50 min</button>
       <button class="preset-btn" id="preset-10" type="button" onclick="selectPreset(10)">10 min</button>
     </section>
 
-    <section class="timer-wrap" aria-label="Timer">
+    <section class="timer-wrap" aria-label="Minuteur">
       <svg class="timer-svg" viewBox="0 0 200 200" aria-hidden="true">
         <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
         <circle id="progress" class="ring" cx="100" cy="100" r="90" stroke="#ffffff" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
       </svg>
       <div class="center">
-        <div id="time" class="time">25:00</div>
-        <div id="badge" class="badge">FOCUS SESSION</div>
+        <div id="time" class="time" aria-live="polite" aria-atomic="true">25:00</div>
+        <div id="badge" class="badge" aria-live="polite">FOCUS SESSION</div>
       </div>
     </section>
 
     <section class="actions">
-      <button id="mainBtn" class="action" type="button" onclick="toggleTimer()">DEBUTER</button>
-      <button class="icon-btn" type="button" onclick="resetTimer()" aria-label="Reset">R</button>
+      <button id="mainBtn" class="action" type="button" onclick="toggleTimer()" aria-label="Démarrer le minuteur">DEBUTER</button>
+      <button class="icon-btn" type="button" onclick="resetTimer()" aria-label="Réinitialiser le minuteur">⟲</button>
     </section>
 
     <section class="small-row">
-      <button class="mini" type="button" onclick="adjustTime(-60)">-1 MIN</button>
-      <button class="mini" type="button" onclick="adjustTime(60)">+1 MIN</button>
+      <button class="mini" type="button" onclick="adjustTime(-60)" aria-label="Diminuer de 1 minute">-1 MIN</button>
+      <button class="mini" type="button" onclick="adjustTime(60)" aria-label="Augmenter de 1 minute">+1 MIN</button>
     </section>
 
     <section class="settings">
       <label class="setting">
         <span>Notif</span>
-        <input id="notifToggle" type="checkbox" onchange="toggleNotifications()" />
+        <input id="notifToggle" type="checkbox" onchange="toggleNotifications()" aria-label="Activer les notifications" />
       </label>
       <label class="setting">
         <span>Son</span>
-        <input id="soundToggle" type="checkbox" checked onchange="saveState()" />
+        <input id="soundToggle" type="checkbox" checked onchange="saveState()" aria-label="Activer les sons" />
       </label>
+    </section>
+
+    <section class="stats">
+      <div class="stat-box">
+        <div class="label">Complétés</div>
+        <div class="value" id="completedSessions">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Temps total</div>
+        <div class="value" id="totalTime">0h</div>
+      </div>
     </section>
 
     <div id="note" class="footer-note"></div>
@@ -314,7 +457,7 @@
       10: { work: 10 * 60, break: 2 * 60, color: '#06b6d4', glow: 'rgba(6,182,212,0.06)' }
     };
 
-    const STORAGE_KEY = 'pomodoro_single_html_v1';
+    const STORAGE_KEY = 'pomodoro_single_html_v2';
     const circumference = 2 * Math.PI * 90;
 
     let currentPreset = 25;
@@ -324,19 +467,31 @@
     let endTime = 0;
     let loop = null;
     let wakeLock = null;
-    let pendingNotification = null;
+    let completedSessions = 0;
+    let totalTimeSpent = 0;
+    
+    // Shared AudioContext instance
+    let audioCtx = null;
+    const initAudioContext = () => {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+      }
+      return audioCtx;
+    };
 
     const $ = (id) => document.getElementById(id);
 
-    function setNote(msg) {
-      $('note').textContent = msg || '';
+    function setNote(msg, isError = false) {
+      const noteEl = $('note');
+      noteEl.textContent = msg || '';
+      noteEl.classList.toggle('error', isError);
     }
 
     function beep(isBreak) {
       if (!$('soundToggle').checked) return;
       try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AudioContext();
+        const ctx = initAudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
@@ -347,7 +502,9 @@
         gain.connect(ctx.destination);
         osc.start();
         osc.stop(ctx.currentTime + 0.55);
-      } catch (e) {}
+      } catch (e) {
+        console.error('Erreur audio:', e);
+      }
     }
 
     function canNotify() {
@@ -356,25 +513,25 @@
 
     async function requestNotificationPermission() {
       if (!('Notification' in window)) {
-        setNote('Notifications non supportées');
+        setNote('Notifications non supportées', true);
         return false;
       }
       if (Notification.permission === 'granted') return true;
       if (Notification.permission === 'denied') {
-        setNote('Notifications refusées. Vérifiez les paramètres.');
+        setNote('Notifications refusées. Vérifiez les paramètres.', true);
         return false;
       }
       try {
         const result = await Notification.requestPermission();
         if (result === 'granted') {
-          setNote('Notifications activées.');
+          setNote('Notifications activées ✓');
           return true;
         } else {
-          setNote('Notifications refusées.');
+          setNote('Notifications refusées', true);
           return false;
         }
       } catch (e) {
-        setNote('Erreur permission notifications');
+        setNote('Erreur permission notifications', true);
         return false;
       }
     }
@@ -396,21 +553,33 @@
     function showNotification(title, body) {
       if (!canNotify()) return;
       try {
-        new Notification(title, { body });
-      } catch (e) {}
+        new Notification(title, { 
+          body,
+          tag: 'pomodoro',
+          badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ff6b6b"/></svg>'
+        });
+      } catch (e) {
+        console.error('Erreur notification:', e);
+      }
     }
 
     async function requestWake() {
       if ('wakeLock' in navigator) {
         try {
           wakeLock = await navigator.wakeLock.request('screen');
-        } catch (e) {}
+        } catch (e) {
+          console.warn('Wake Lock échoué:', e);
+        }
       }
     }
 
     async function releaseWake() {
       if (wakeLock) {
-        try { await wakeLock.release(); } catch (e) {}
+        try { 
+          await wakeLock.release(); 
+        } catch (e) {
+          console.warn('Erreur libération Wake Lock:', e);
+        }
         wakeLock = null;
       }
     }
@@ -419,6 +588,18 @@
       const total = currentPhase === 'work' ? PRESETS[currentPreset].work : PRESETS[currentPreset].break;
       const offset = circumference - (timeLeft / total) * circumference;
       $('progress').style.strokeDashoffset = offset;
+    }
+
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      if (hours > 0) return `${hours}h${mins}m`;
+      return `${mins}m`;
+    }
+
+    function updateStats() {
+      $('completedSessions').textContent = completedSessions;
+      $('totalTime').textContent = formatTime(totalTimeSpent);
     }
 
     function render() {
@@ -466,7 +647,9 @@
         timeLeft,
         endTime,
         notif: $('notifToggle').checked,
-        sound: $('soundToggle').checked
+        sound: $('soundToggle').checked,
+        completedSessions,
+        totalTimeSpent
       }));
     }
 
@@ -475,6 +658,7 @@
       if (!raw) {
         timeLeft = PRESETS[currentPreset].work;
         render();
+        updateStats();
         return;
       }
 
@@ -485,6 +669,8 @@
         isActive = !!state.isActive;
         timeLeft = typeof state.timeLeft === 'number' ? state.timeLeft : PRESETS[currentPreset].work;
         endTime = typeof state.endTime === 'number' ? state.endTime : 0;
+        completedSessions = typeof state.completedSessions === 'number' ? state.completedSessions : 0;
+        totalTimeSpent = typeof state.totalTimeSpent === 'number' ? state.totalTimeSpent : 0;
         $('notifToggle').checked = !!state.notif;
         $('soundToggle').checked = state.sound !== false;
 
@@ -499,6 +685,7 @@
           timeLeft = Math.max(0, timeLeft);
         }
       } catch (e) {
+        console.error('Erreur chargement état:', e);
         currentPreset = 25;
         currentPhase = 'work';
         isActive = false;
@@ -506,6 +693,7 @@
       }
 
       render();
+      updateStats();
     }
 
     function selectPreset(minutes) {
@@ -553,9 +741,11 @@
           const breakDuration = PRESETS[currentPreset].break;
           endTime = endTime + (breakDuration * 1000);
           timeLeft = Math.max(0, Math.ceil((endTime - now) / 1000));
+          completedSessions++;
+          totalTimeSpent += PRESETS[currentPreset].work;
           beep(true);
           if (navigator.vibrate) navigator.vibrate([180, 80, 180]);
-          showNotification('Pomodoro', 'Session terminee. Pause commencee.');
+          showNotification('Pomodoro', 'Session terminée. Pause commencée.');
         } else {
           isActive = false;
           currentPhase = 'work';
@@ -563,9 +753,8 @@
           endTime = 0;
           beep(false);
           if (navigator.vibrate) navigator.vibrate(300);
-          showNotification('Pomodoro', 'Pause terminee. Retour au focus.');
+          showNotification('Pomodoro', 'Pause terminée. Retour au focus.');
           releaseWake();
-          pendingNotification = null;
           break;
         }
       }
@@ -578,6 +767,7 @@
       }
 
       saveState();
+      updateStats();
       render();
     }
 
@@ -588,7 +778,7 @@
         timeLeft = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
         endTime = 0;
         releaseWake();
-        setNote('Pause manuelle.');
+        setNote('Pause manuelle');
       } else {
         if ($('notifToggle').checked && Notification.permission !== 'granted') {
           const permitted = await requestNotificationPermission();
@@ -598,10 +788,6 @@
         }
         isActive = true;
         endTime = Date.now() + (timeLeft * 1000);
-        pendingNotification = {
-          phase: currentPhase,
-          when: endTime
-        };
         beep(currentPhase === 'break');
         startLoop();
         requestWake();
@@ -617,9 +803,8 @@
       currentPhase = 'work';
       timeLeft = PRESETS[currentPreset].work;
       endTime = 0;
-      pendingNotification = null;
       releaseWake();
-      setNote('Reset.');
+      setNote('Réinitialisé');
       saveState();
       render();
     }
@@ -637,6 +822,11 @@
     window.addEventListener('beforeunload', () => {
       saveState();
     });
+
+    // Amélioration du contraste pour l'accessibilité
+    if (window.matchMedia && window.matchMedia('(prefers-contrast: more)').matches) {
+      document.documentElement.style.setProperty('--muted', '#4b5563');
+    }
 
     loadState();
   </script>
