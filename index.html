@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="description" content="Minuteur Pomodoro minimaliste avec notifications, sons et statistiques. Productivité simplifiée." />
+  <meta name="description" content="Minimalist Pomodoro timer with notifications, sounds and statistics. Simplified productivity." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#08090d" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Chronoflow" />
   <meta property="og:title" content="Chronoflow - Focus Timer" />
-  <meta property="og:description" content="Minuteur Pomodoro minimaliste avec notifications et sons" />
+  <meta property="og:description" content="Minimalist Pomodoro timer with notifications and sounds" />
   <meta property="og:url" content="https://chronoflow.vercel.app/" />
   <meta property="og:type" content="website" />
   <meta name="color-scheme" content="light dark" />
   <meta name="keywords" content="pomodoro, timer, productivity, focus, deep work" />
-  <title>Chronoflow - Minuteur de productivité</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff6b6b'/><circle cx='50' cy='50' r='40' fill='%232d2d2d'/><path d='M50,20 L50,50 L75,65' stroke='%23ff6b6b' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+  <title>Chronoflow - Productivity Timer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff6b6b'/><circle cx='50' cy='50' r='40' fill='%232[...]
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><circle cx='90' cy='90' r='85' fill='%23ff6b6b'/><circle cx='90' cy='90' r='75' fill='%232d2d2d'/><path d='M90,30 L90,90 L120,115' stroke='%23ff6b6b' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><circle cx='90' cy='90' r='85' fill='%23ff6b6b'/><circle cx='90' cy='90' r='75[...]
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -392,6 +392,28 @@
       display: none !important;
     }
 
+    .clear-data-btn {
+      width: 100%;
+      height: 40px;
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 160ms ease, background-color 160ms ease;
+    }
+
+    .clear-data-btn:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    .clear-data-btn:active {
+      transform: scale(0.98);
+    }
+
     @media (max-width: 360px) {
       .card {
         padding: 16px;
@@ -415,13 +437,13 @@
   <div class="glow" id="glow"></div>
 
   <main class="card" role="main">
-    <section class="presets" aria-label="Présets de durée">
-      <button class="preset-btn active" id="preset-25" type="button" aria-label="Session de 25 minutes">25 min</button>
-      <button class="preset-btn" id="preset-50" type="button" aria-label="Session de 50 minutes">50 min</button>
-      <button class="preset-btn" id="preset-10" type="button" aria-label="Session de 10 minutes">10 min</button>
+    <section class="presets" aria-label="Duration presets">
+      <button class="preset-btn active" id="preset-25" type="button" aria-label="25 minute session">25 min</button>
+      <button class="preset-btn" id="preset-50" type="button" aria-label="50 minute session">50 min</button>
+      <button class="preset-btn" id="preset-10" type="button" aria-label="10 minute session">10 min</button>
     </section>
 
-    <section class="timer-wrap" aria-label="Minuteur">
+    <section class="timer-wrap" aria-label="Timer">
       <svg class="timer-svg" viewBox="0 0 200 200" aria-hidden="true">
         <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
         <circle id="progress" class="ring" cx="100" cy="100" r="90" stroke="#ffffff" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
@@ -433,36 +455,38 @@
     </section>
 
     <section class="actions">
-      <button id="mainBtn" class="action" type="button" aria-label="Démarrer le minuteur">DEBUTER</button>
-      <button class="icon-btn" type="button" aria-label="Réinitialiser le minuteur">⟲</button>
+      <button id="mainBtn" class="action" type="button" aria-label="Start the timer">START</button>
+      <button class="icon-btn" type="button" aria-label="Reset the timer">⟲</button>
     </section>
 
     <section class="small-row">
-      <button class="mini" type="button" aria-label="Diminuer de 1 minute">-1 MIN</button>
-      <button class="mini" type="button" aria-label="Augmenter de 1 minute">+1 MIN</button>
+      <button class="mini" type="button" aria-label="Decrease by 1 minute">-1 MIN</button>
+      <button class="mini" type="button" aria-label="Increase by 1 minute">+1 MIN</button>
     </section>
 
     <section class="settings">
       <label class="setting">
-        <span>Notif</span>
-        <input id="notifToggle" type="checkbox" aria-label="Activer les notifications" />
+        <span>Notify</span>
+        <input id="notifToggle" type="checkbox" aria-label="Enable notifications" />
       </label>
       <label class="setting">
-        <span>Son</span>
-        <input id="soundToggle" type="checkbox" checked aria-label="Activer les sons" />
+        <span>Sound</span>
+        <input id="soundToggle" type="checkbox" checked aria-label="Enable sounds" />
       </label>
     </section>
 
     <section class="stats">
       <div class="stat-box">
-        <div class="label">Complétés</div>
+        <div class="label">Completed</div>
         <div class="value" id="completedSessions">0</div>
       </div>
       <div class="stat-box">
-        <div class="label">Temps total</div>
+        <div class="label">Total Time</div>
         <div class="value" id="totalTime">0h</div>
       </div>
     </section>
+
+    <button id="clearDataBtn" class="clear-data-btn" type="button" aria-label="Clear all data including total hours">🗑 Clear All Data</button>
 
     <div id="note" class="footer-note" role="status" aria-live="polite" aria-atomic="true"></div>
   </main>
@@ -575,25 +599,26 @@
      */
     async function requestNotificationPermission() {
       if (!('Notification' in window)) {
-        setNote('Notifications non supportées', true);
+        setNote('Notifications not supported', true);
         return false;
       }
       if (Notification.permission === 'granted') return true;
       if (Notification.permission === 'denied') {
-        setNote('Notifications refusées. Vérifiez les paramètres.', true);
+        setNote('Notifications denied. Check settings.', true);
         return false;
       }
       try {
         const result = await Notification.requestPermission();
         if (result === 'granted') {
-          setNote('Notifications activées ✓');
+          setNote('Notifications enabled ✓');
           return true;
         } else {
-          setNote('Notifications refusées', true);
+          setNote('Notifications denied', true);
           return false;
         }
       } catch (e) {
-        setNote('Erreur permission notifications', true);
+        setNote('Notification permission error', true);
+        console.error('Notification permission error:', e);
         return false;
       }
     }
@@ -621,13 +646,20 @@
      * @param {string} body - Notification body
      */
     function showNotification(title, body) {
-      if (!canNotify()) return;
+      if (!canNotify()) {
+        console.debug('Notifications disabled or permission not granted');
+        return;
+      }
       try {
+        // For Brave Android compatibility: use tag and badge
         new Notification(title, {
           body,
           tag: 'pomodoro',
-          badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ff6b6b"/></svg>'
+          badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ff6b6b"/></svg>',
+          icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ff6b6b"/></svg>',
+          requireInteraction: false
         });
+        console.debug('Notification sent:', title);
       } catch (e) {
         console.error('Notification failed:', e);
       }
@@ -640,6 +672,7 @@
       if ('wakeLock' in navigator) {
         try {
           wakeLock = await navigator.wakeLock.request('screen');
+          console.debug('Wake lock acquired');
         } catch (e) {
           console.warn('Wake Lock request failed:', e);
         }
@@ -653,6 +686,7 @@
       if (wakeLock) {
         try {
           await wakeLock.release();
+          console.debug('Wake lock released');
         } catch (e) {
           console.warn('Wake Lock release failed:', e);
         }
@@ -690,6 +724,27 @@
     }
 
     /**
+     * Clear all data
+     */
+    function clearAllData() {
+      if (confirm('Are you sure you want to clear all data? This will reset the timer, sessions completed, and total time.')) {
+        completedSessions = 0;
+        totalTimeSpent = 0;
+        isActive = false;
+        stopLoop();
+        currentPhase = 'work';
+        currentPreset = 25;
+        timeLeft = PRESETS[25].work;
+        endTime = 0;
+        releaseWake();
+        localStorage.removeItem(STORAGE_KEY);
+        setNote('All data cleared ✓');
+        updateStats();
+        render();
+      }
+    }
+
+    /**
      * Render the UI with current state
      */
     function render() {
@@ -707,7 +762,7 @@
         $('glow').style.background = cfg.glow;
       } else {
         $('progress').setAttribute('stroke', '#10b981');
-        $('badge').textContent = 'PAUSE';
+        $('badge').textContent = 'BREAK';
         $('badge').style.background = 'rgba(16,185,129,0.10)';
         $('badge').style.color = '#6ee7b7';
         $('badge').style.borderColor = 'rgba(16,185,129,0.12)';
@@ -718,7 +773,7 @@
         $('mainBtn').textContent = 'PAUSE';
         $('mainBtn').classList.add('paused');
       } else {
-        $('mainBtn').textContent = 'DEBUTER';
+        $('mainBtn').textContent = 'START';
         $('mainBtn').classList.remove('paused');
       }
 
@@ -862,7 +917,8 @@
           totalTimeSpent += PRESETS[currentPreset].work;
           beep(true);
           if (navigator.vibrate) navigator.vibrate([180, 80, 180]);
-          showNotification('Chronoflow', 'Session terminée. Pause commencée.');
+          showNotification('Chronoflow', 'Session complete. Break time started.');
+          console.debug('Work session completed, break started');
         } else {
           isActive = false;
           currentPhase = 'work';
@@ -870,8 +926,9 @@
           endTime = 0;
           beep(false);
           if (navigator.vibrate) navigator.vibrate(300);
-          showNotification('Chronoflow', 'Pause terminée. Retour au focus.');
+          showNotification('Chronoflow', 'Break complete. Ready to focus.');
           releaseWake();
+          console.debug('Break completed, ready for next session');
           break;
         }
       }
@@ -898,7 +955,7 @@
         timeLeft = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
         endTime = 0;
         releaseWake();
-        setNote('Pause manuelle');
+        setNote('Manual pause');
       } else {
         if ($('notifToggle')?.checked && Notification.permission !== 'granted') {
           const permitted = await requestNotificationPermission();
@@ -913,6 +970,7 @@
         startLoop();
         requestWake();
         setNote('');
+        console.debug('Timer started for', currentPhase, 'phase');
       }
       saveState();
       render();
@@ -928,7 +986,7 @@
       timeLeft = PRESETS[currentPreset].work;
       endTime = 0;
       releaseWake();
-      setNote('Réinitialisé');
+      setNote('Timer reset');
       saveState();
       render();
     }
@@ -949,15 +1007,20 @@
 
     document.getElementById('notifToggle')?.addEventListener('change', toggleNotifications);
     document.getElementById('soundToggle')?.addEventListener('change', saveState);
+    document.getElementById('clearDataBtn')?.addEventListener('click', clearAllData);
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && isActive) {
+        console.debug('App became visible, catching up');
         catchUp();
       }
     });
 
     window.addEventListener('focus', () => {
-      if (isActive) catchUp();
+      if (isActive) {
+        console.debug('Window focused, catching up');
+        catchUp();
+      }
     });
 
     window.addEventListener('beforeunload', () => {
@@ -965,6 +1028,7 @@
     });
 
     // Initialize
+    console.debug('Initializing Chronoflow timer');
     loadState();
   </script>
 </body>
