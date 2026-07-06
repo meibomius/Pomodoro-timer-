@@ -2,13 +2,15 @@
  * Chronoflow Service Worker
  * Handles background notifications and app lifecycle
  * Critical for notifications on Brave Android
+ * FIXED: Cache handling and fetch strategies
  */
 
 const CACHE_VERSION = 'chronoflow-v1';
 const CACHE_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/sw.js'
 ];
 
 /**
@@ -50,6 +52,7 @@ self.addEventListener('activate', (event) => {
 /**
  * Fetch event: Network-first strategy
  * Try network first, fall back to cache
+ * FIXED: Properly await cache operations
  */
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
@@ -58,17 +61,26 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     fetch(event.request)
-      .then((response) => {
+      .then(async (response) => {
         // Cache successful responses
         if (response && response.status === 200) {
-          const cache = caches.open(CACHE_VERSION);
-          cache.then((c) => c.put(event.request, response.clone()));
+          try {
+            const cache = await caches.open(CACHE_VERSION);
+            cache.put(event.request, response.clone());
+          } catch (err) {
+            console.warn('[SW] Cache put failed:', err.message);
+          }
         }
         return response;
       })
-      .catch(() => {
+      .catch(async () => {
         // Fall back to cache if network fails
-        return caches.match(event.request);
+        try {
+          return await caches.match(event.request);
+        } catch (err) {
+          console.warn('[SW] Cache match failed:', err.message);
+          return null;
+        }
       })
   );
 });
