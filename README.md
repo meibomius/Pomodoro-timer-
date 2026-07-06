@@ -4,7 +4,7 @@ A minimalist, distraction-free focus timer engineered for reliability, precision
 
 Built as a single-file web application with **zero dependencies**, **zero backend**, and **instant deployment support**.
 
-🚀 **[Live Demo](https://pomodoro-timer-3rup.vercel.app//)**
+🚀 **[Live Demo](https://pomodoro-timer-3rup.vercel.app/)**
 
 ---
 
@@ -122,6 +122,14 @@ Chronoflow collects:
 
 Everything remains **on your device**.
 
+### 🟢 Brave Android Support
+
+Fully compatible with Brave Browser on Android:
+- ✅ PWA manifest for installation
+- ✅ Graceful fallback for privacy-blocking features
+- ✅ No external dependencies that may be blocked
+- ✅ Tested on Brave privacy mode
+
 ---
 
 ## 🛠️ Technical Architecture
@@ -130,7 +138,7 @@ Everything remains **on your device**.
 - HTML5
 - CSS3 (with CSS variables, media queries)
 - Vanilla JavaScript (ES6+)
-- Module pattern (IIFE)
+- Single-file architecture (no build required)
 
 **Storage:**
 - LocalStorage (browser persistence)
@@ -140,6 +148,7 @@ Everything remains **on your device**.
 - Wake Lock API (screen management)
 - Notifications API (system notifications)
 - Vibration API (haptic feedback)
+- Web App Manifest (PWA support)
 
 **Deployment:**
 Compatible with:
@@ -157,7 +166,7 @@ Compatible with:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/derouachadam036-a11y/Pomodoro-timer-.git
+   git clone https://github.com/meibomius/Pomodoro-timer-.git
    cd Pomodoro-timer-
    ```
 
@@ -198,7 +207,7 @@ Enable GitHub Pages from `Settings` → `Pages` → `Deploy from branch: main`
 
 #### Manual Deployment
 
-Simply upload `index.html` to any static hosting.
+Simply upload `index.html` and `manifest.json` to any static hosting.
 
 ---
 
@@ -221,6 +230,7 @@ Simply upload `index.html` to any static hosting.
 | Firefox | ✅ Latest 2 | ✅ Latest 2 |
 | Safari | ✅ Latest 2 | ✅ Latest 2 |
 | Samsung Internet | - | ✅ Latest 2 |
+| Brave | ✅ Latest 2 | ✅ Latest 2 |
 
 ---
 
@@ -273,7 +283,8 @@ python -m http.server 8000
 ### Code Structure
 
 - `index.html` - Complete application (HTML + CSS + JS)
-- Single-file architecture with IIFE module pattern
+- `manifest.json` - PWA configuration
+- Single-file architecture with modular JavaScript
 - All styles and scripts embedded
 
 ### Code Quality
@@ -284,6 +295,7 @@ python -m http.server 8000
 - ✅ CSP (Content Security Policy) enabled
 - ✅ Logging with prefixed console output
 - ✅ Type-safe comparisons
+- ✅ Brave Android compatibility layer
 
 ### Contributing
 
@@ -344,6 +356,8 @@ const PRESETS = {
 - ✅ Added input validation
 - ✅ Improved error handling
 - ✅ Added logging system with prefix
+- ✅ Fixed all event listeners
+- ✅ Added Brave Android compatibility
 
 ### Bug Fixes
 - ✅ Fixed preset validation
@@ -351,18 +365,28 @@ const PRESETS = {
 - ✅ Fixed notification permission flow
 - ✅ Improved wake lock management
 - ✅ Better state recovery after crashes
+- ✅ Fixed missing event listeners on mini buttons
+- ✅ Corrected SVG icon data URIs
 
 ### Security
 - ✅ Added CSP meta tag
 - ✅ Input validation for all user actions
 - ✅ Type checking for presets
 - ✅ Safe error handling
+- ✅ Graceful degradation for blocked APIs
 
 ### Accessibility
 - ✅ Better ARIA labels
 - ✅ Improved keyboard shortcuts (Space + R)
 - ✅ Better focus management
 - ✅ Screen reader optimizations
+
+### Brave Android Specific
+- ✅ PWA manifest.json added
+- ✅ Fixed SVG icons in manifest
+- ✅ Graceful fallback for Web Audio API
+- ✅ Proper notification badge/icon handling
+- ✅ Tab visibility change handling
 
 ---
 
@@ -382,8 +406,8 @@ Independent project focused on creating fast, reliable, privacy-friendly product
 
 ## 💬 Support
 
-- **Issues:** [GitHub Issues](https://github.com/derouachadam036-a11y/Pomodoro-timer-/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/derouachadam036-a11y/Pomodoro-timer-/discussions)
+- **Issues:** [GitHub Issues](https://github.com/meibomius/Pomodoro-timer-/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/meibomius/Pomodoro-timer-/discussions)
 
 ---
 
